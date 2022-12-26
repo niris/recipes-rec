@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mongo
+    volumes: 
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: recipes
+    command: mongod --auth
+    ports:
+      - 27017:27017
+
+  flask:
+    build:
+      context: .
+      target: builder
+    volumes:
+      - ./flask:/code
+    ports:
+      - 8000:8000
+    stop_signal: SIGINT

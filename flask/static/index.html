@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<script type="module">
+    // ES6 import shall work in @19
+    import * as _React from "https://unpkg.com/react@18/umd/react.development.js"
+    import * as _ReactDOM from "https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    class Main extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { recipes: [] };
+        }
+        async list() {
+            const recipes = await fetch("/recipe").then(req => req.json())
+            this.setState(state => ({ recipes }))
+        }
+        async componentDidMount() {
+            await this.list()
+        }
+        render() {
+            return React.createElement("div", {},
+                React.createElement("h3", {},
+                    "Recipe List"
+                ),
+                React.createElement("ul", {},
+                    this.state.recipes.map((x, key) => React.createElement("li", { key: x._id }, x.name))
+                ),
+                React.createElement("form", {
+                    onSubmit: async (e) => {
+                        e.preventDefault();
+                        await fetch("/recipe", { method: "POST", body: new FormData(e.target) });
+                        await this.list();
+                        e.target.reset();
+                    }
+                },
+                    React.createElement("input", { name: "name", required: true }),
+                    React.createElement("button", {},
+                        "add recipe"
+                    )
+                ),
+            );
+        }
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"))
+    root.render(React.createElement(Main));
+</script>
+<div id="root"></div>
